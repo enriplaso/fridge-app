@@ -4,18 +4,18 @@
     <q-search v-model="search" />
     <q-list highlight>
       <q-list-header>Fridge items</q-list-header>
-      <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name"  v-on:click="showDialog(fridgeItem);">
-        <q-item-main>
+      <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name">
+        <q-item-main  v-on:click="editOrCreate(fridgeItem)">
           <q-item-tile label>{{fridgeItem.name}}</q-item-tile>
           <q-item-tile sublabel>Quasar enthusiast</q-item-tile>
         </q-item-main>
         <q-item-side right>
-          <q-item-tile icon="chat_bubble" color="green" />
+          <q-item-tile icon="delete" color="red"  v-on:click="deleteItem(fridgeItem)"/>
         </q-item-side>
       </q-item>
       <q-item-separator inset />
     </q-list>
-    <q-btn class="create-button" round icon="create" color="secondary" v-on:click="showDialog()"></q-btn>
+    <q-btn class="create-button" round icon="create" color="secondary" v-on:click="editOrCreate()"></q-btn>
   </div>
 </template>
 <script>
@@ -84,7 +84,7 @@ export default {
       this.fridgeItemsList = localStorageService.getData()
       alert('TEST')
     },
-    showDialog (fridgeItem) {
+    editOrCreate (fridgeItem) {
       Dialog.create({
         title: fridgeItem ? 'Edit' : 'Create',
         form: {
@@ -118,6 +118,21 @@ export default {
           }
         ]
       })
+    },
+    deleteItem (fridgeItem) {
+      Dialog.create({
+        title: 'Do you want to delete this item',
+        buttons: [
+          'NO',
+          {
+            label: 'Yes',
+            handler: () => {
+            
+            }
+          }
+        ]
+      })
+
     }
   }
 }
