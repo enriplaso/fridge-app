@@ -4,7 +4,7 @@
     <q-search v-model="search" />
     <q-list highlight>
       <q-list-header>Fridge items</q-list-header>
-      <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name"  v-on:click="itenDialog.handler(fridgeItem)">
+      <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name"  v-on:click="showDialog(fridgeItem);">
         <q-item-main>
           <q-item-tile label>{{fridgeItem.name}}</q-item-tile>
           <q-item-tile sublabel>Quasar enthusiast</q-item-tile>
@@ -15,10 +15,12 @@
       </q-item>
       <q-item-separator inset />
     </q-list>
-    <q-btn class="create-button" round icon="create" color="secondary" v-on:click="itenDialog.handler()"></q-btn>
+    <q-btn class="create-button" round icon="create" color="secondary" v-on:click="showDialog()"></q-btn>
   </div>
 </template>
 <script>
+import LocalStorageService from 'services/LocalStorageService'
+const localStorageService = new LocalStorageService()
 import {
   QLayout,
   QToolbar,
@@ -29,6 +31,8 @@ import {
   QListHeader,
   QItem,
   QItemSide,
+  QItemTile,
+  QItemSeparator,
   QItemMain,
   QSearch,
   Dialog,
@@ -45,6 +49,8 @@ export default {
     QListHeader,
     QItem,
     QItemSide,
+    QItemTile,
+    QItemSeparator,
     QItemMain,
     QSearch,
     Dialog,
@@ -53,61 +59,65 @@ export default {
   data () {
     return {
       search: '',
-      fridgeItemsList: [
-        {name: 'bannana', quantity: 3, expiredDate: '28/10/2017', comment: 'xxxx'},
-        {name: 'yogurt', quantity: 3, expiredDate: '28/10/2017', comment: 'xxxx'},
-        {name: 'Cheese', quantity: 3, expiredDate: '28/10/2017', comment: 'xxxx'},
-        {name: 'Milk', quantity: 3, expireddate: '28/10/2017', comment: 'xxxx'}
-      ],
-      itenDialog: {
-        label: 'Edit Item',
-        icon: 'warning',
-        handler (fridgeItem) {
-          Dialog.create({
-            title: fridgeItem ? 'Edit' : 'Create',
-            form: {
-              name: {
-                type: 'text',
-                label: 'Item name',
-                model: fridgeItem ? fridgeItem.name: ''
-              },
-              age: {
-                type: 'number',
-                label: 'Number of items',
-                model: fridgeItem ? fridgeItem.quantity: 1,
-                min: 1,
-                max: 90
-              },
-              comments: {
-                type: 'textarea',
-                label: 'Comment',
-                model: fridgeItem ? fridgeItem.comment: '',
-              }
-            },
-            buttons: [
-              'Cancel',
-              {
-                label: 'Ok',
-                handler (data) {
-                  Toast.create('Returned ' + JSON.stringify(data))
-                }
-              }
-            ]
-          })
-        }
-      }
+      fridgeItemsList: []
     }
+  },
+  watch: {
+    fridgeItemsList: function (val, oldVal) {
+      console.log('new: %s, old: %s', val, oldVal)
+    }
+  },
+  created () {
+    this.fridgeItemsList = localStorageService.getData()
+    console.log(this.fridgeItemsList)
   },
   computed: {
     filteredList () {
+      console.log(Object.keys(this.fridgeItemsList))
       return this.fridgeItemsList.filter(item => {
-        return item.name.toLowerCase().includes(this.search.toLowerCase())
+        return item && item.name ? item.name.toLowerCase().includes(this.search.toLowerCase()) : {}
       })
     }
   },
   methods: {
-    openListItemModal (edit) {
+    getData () {
+      this.fridgeItemsList = localStorageService.getData()
       alert('TEST')
+    },
+    showDialog (fridgeItem) {
+      Dialog.create({
+        title: fridgeItem ? 'Edit' : 'Create',
+        form: {
+          name: {
+            type: 'text',
+            label: 'Item name',
+            model: fridgeItem ? fridgeItem.name : ' '
+          },
+          quantity: {
+            type: 'number',
+            label: 'Number of items',
+            model: fridgeItem ? fridgeItem.quantity : 1,
+            min: 1,
+            max: 90
+          },
+          comment: {
+            type: 'textarea',
+            label: 'Comment',
+            model: fridgeItem ? fridgeItem.comment : ' '
+          }
+        },
+        buttons: [
+          'Cancel',
+          {
+            label: 'Ok',
+            handler: (data) => {
+              Toast.create('Returned ' + JSON.stringify(data))
+              localStorageService.addItem(data)
+              this.fridgeItemsList = localStorageService.getData()
+            }
+          }
+        ]
+      })
     }
   }
 }
