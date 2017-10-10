@@ -4,7 +4,7 @@
     <q-search v-model="search" />
     <q-list highlight>
       <q-list-header>Fridge items</q-list-header>
-      <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name"  v-on:click="openListItemDetails()">
+      <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name"  v-on:click="itenDialog.handler(fridgeItem)">
         <q-item-main>
           <q-item-tile label>{{fridgeItem.name}}</q-item-tile>
           <q-item-tile sublabel>Quasar enthusiast</q-item-tile>
@@ -15,6 +15,7 @@
       </q-item>
       <q-item-separator inset />
     </q-list>
+    <q-btn class="create-button" round icon="create" color="secondary" v-on:click="itenDialog.handler()"></q-btn>
   </div>
 </template>
 <script>
@@ -29,7 +30,9 @@ import {
   QItem,
   QItemSide,
   QItemMain,
-  QSearch
+  QSearch,
+  Dialog,
+  Toast
 } from 'quasar'
 export default {
   components: {
@@ -43,7 +46,9 @@ export default {
     QItem,
     QItemSide,
     QItemMain,
-    QSearch
+    QSearch,
+    Dialog,
+    Toast
   },
   data () {
     return {
@@ -53,7 +58,44 @@ export default {
         {name: 'yogurt', quantity: 3, expiredDate: '28/10/2017', comment: 'xxxx'},
         {name: 'Cheese', quantity: 3, expiredDate: '28/10/2017', comment: 'xxxx'},
         {name: 'Milk', quantity: 3, expireddate: '28/10/2017', comment: 'xxxx'}
-      ]
+      ],
+      itenDialog: {
+        label: 'Edit Item',
+        icon: 'warning',
+        handler (fridgeItem) {
+          Dialog.create({
+            title: fridgeItem ? 'Edit' : 'Create',
+            form: {
+              name: {
+                type: 'text',
+                label: 'Item name',
+                model: fridgeItem ? fridgeItem.name: ''
+              },
+              age: {
+                type: 'number',
+                label: 'Number of items',
+                model: fridgeItem ? fridgeItem.quantity: 1,
+                min: 1,
+                max: 90
+              },
+              comments: {
+                type: 'textarea',
+                label: 'Comment',
+                model: fridgeItem ? fridgeItem.comment: '',
+              }
+            },
+            buttons: [
+              'Cancel',
+              {
+                label: 'Ok',
+                handler (data) {
+                  Toast.create('Returned ' + JSON.stringify(data))
+                }
+              }
+            ]
+          })
+        }
+      }
     }
   },
   computed: {
@@ -64,7 +106,7 @@ export default {
     }
   },
   methods: {
-    openListItemDetails () {
+    openListItemModal (edit) {
       alert('TEST')
     }
   }
@@ -76,4 +118,8 @@ export default {
   position absolute
   height 100%
   width 100%
+.create-button
+  position fixed
+  bottom 10px
+  right 10px
 </style>
