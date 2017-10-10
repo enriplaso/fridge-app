@@ -7,7 +7,7 @@
       <q-item v-for="fridgeItem in filteredList" v-bind:key="fridgeItem.name">
         <q-item-main  v-on:click="editOrCreate(fridgeItem)">
           <q-item-tile label>{{fridgeItem.name}}</q-item-tile>
-          <q-item-tile sublabel>Quasar enthusiast</q-item-tile>
+          <q-item-tile color="green" sublabel>{{fridgeItem.quantity}}</q-item-tile>
         </q-item-main>
         <q-item-side right>
           <q-item-tile icon="delete" color="red"  v-on:click="deleteItem(fridgeItem)"/>
@@ -112,7 +112,13 @@ export default {
             label: 'Ok',
             handler: (data) => {
               Toast.create('Returned ' + JSON.stringify(data))
-              localStorageService.addItem(data)
+              if (fridgeItem) {
+                localStorageService.editItem(data)
+              }
+              else {
+                localStorageService.addItem(data)
+              }
+             
               this.fridgeItemsList = localStorageService.getData()
             }
           }
@@ -127,12 +133,12 @@ export default {
           {
             label: 'Yes',
             handler: () => {
-            
+              localStorageService.deleteItem(fridgeItem)
+              this.fridgeItemsList = localStorageService.getData()
             }
           }
         ]
       })
-
     }
   }
 }
