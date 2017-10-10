@@ -24,10 +24,12 @@
     <q-btn class="create-button" round icon="create" color="secondary" v-on:click="editOrCreate()"></q-btn>
   </div>
 </template>
+
 <script>
 import LocalStorageService from 'services/LocalStorageService'
 const localStorageService = new LocalStorageService()
 import {
+  Loading,
   QLayout,
   QToolbar,
   QToolbarTitle,
@@ -44,8 +46,10 @@ import {
   Dialog,
   Toast
 } from 'quasar'
+
 export default {
   components: {
+    Loading,
     QLayout,
     QToolbar,
     QToolbarTitle,
@@ -69,12 +73,13 @@ export default {
     }
   },
   created () {
-    this.fridgeItemsList = localStorageService.getData()
-    console.log(this.fridgeItemsList)
+    Loading.show() 
+    setTimeout( () => { 
+      this.fridgeItemsList = localStorageService.getData()
+      Loading.hide() }, 2000);
   },
   computed: {
     filteredList () {
-      console.log(Object.keys(this.fridgeItemsList))
       return this.fridgeItemsList.filter(item => {
         return item && item.name ? item.name.toLowerCase().includes(this.search.toLowerCase()) : {}
       })
@@ -83,7 +88,6 @@ export default {
   methods: {
     getData () {
       this.fridgeItemsList = localStorageService.getData()
-      alert('TEST')
     },
     editOrCreate (fridgeItem) {
       Dialog.create({
@@ -119,7 +123,6 @@ export default {
               else {
                 localStorageService.addItem(data)
               }
-             
               this.fridgeItemsList = localStorageService.getData()
             }
           }
@@ -128,7 +131,7 @@ export default {
     },
     deleteItem (fridgeItem) {
       Dialog.create({
-        title: 'Do you want to delete this item',
+        title: 'Do you want to delete this item ?',
         buttons: [
           'NO',
           {
@@ -144,6 +147,7 @@ export default {
   }
 }
 </script>
+
 <style lang="stylus">
 /* This is where your CSS goes */
 .item-list-container
@@ -152,8 +156,8 @@ export default {
   width 100%
 .create-button
   position fixed
-  bottom 10px
-  right 10px
+  bottom 20px
+  right 20px
 .list-info
   padding-top 60px
   width 100%
