@@ -73,10 +73,13 @@ export default {
     }
   },
   created () {
-    Loading.show() 
-    setTimeout( () => { 
-      this.fridgeItemsList = localStorageService.getData()
-      Loading.hide() }, 2000);
+    Loading.show()
+    setTimeout(
+      () => {
+        this.fridgeItemsList = localStorageService.getData()
+        Loading.hide()
+      },
+      2000)
   },
   computed: {
     filteredList () {
