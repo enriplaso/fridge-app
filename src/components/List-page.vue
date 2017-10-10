@@ -15,6 +15,12 @@
       </q-item>
       <q-item-separator inset />
     </q-list>
+    <div class="list-info" v-if="fridgeItemsList.length === 0">
+      Please add new Items in the list
+    </div>
+    <div class="list-info" v-else-if="filteredList.length === 0">
+      There are not items with the current search
+    </div>
     <q-btn class="create-button" round icon="create" color="secondary" v-on:click="editOrCreate()"></q-btn>
   </div>
 </template>
@@ -60,11 +66,6 @@ export default {
     return {
       search: '',
       fridgeItemsList: []
-    }
-  },
-  watch: {
-    fridgeItemsList: function (val, oldVal) {
-      console.log('new: %s, old: %s', val, oldVal)
     }
   },
   created () {
@@ -153,4 +154,10 @@ export default {
   position fixed
   bottom 10px
   right 10px
+.list-info
+  padding-top 60px
+  width 100%
+  height 100px
+  position absolute
+  text-align center
 </style>
